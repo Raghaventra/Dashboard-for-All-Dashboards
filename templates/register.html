@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Register — Ultimate Dashboard{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>Create your account</h1>
+    <p class="muted">Use your company email. We'll send a one-time code to verify it.</p>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <form method="post" action="/register" class="form">
+      <label class="field">
+        <span>Company email</span>
+        <input type="email" name="email" value="{{ email or '' }}" placeholder="you@haystackrobotics.com" required autofocus />
+      </label>
+      <button class="btn btn-primary btn-block" type="submit">Send verification code</button>
+    </form>
+
+    <p class="auth-alt">Already have an account? <a href="/login">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

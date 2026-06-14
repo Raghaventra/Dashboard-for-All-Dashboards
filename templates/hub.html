@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Hub — Ultimate Dashboard{% endblock %}
+
+{% block content %}
+<section class="hub-intro">
+  <h1>Welcome{% if current_user.username %}, {{ current_user.username }}{% endif %} 👋</h1>
+  <p class="muted">
+    Double-click any tool to open it in a new tab. {{ total }} dashboard{{ '' if total == 1 else 's' }} available.
+  </p>
+</section>
+
+{% if total == 0 %}
+  <div class="empty">
+    <p>No dashboards have been added yet.</p>
+    {% if current_user.is_admin %}<a class="btn btn-primary" href="/admin">Add dashboards</a>{% endif %}
+  </div>
+{% endif %}
+
+{% for category, items in categories.items() %}
+  <section class="hub-category">
+    <h2 class="category-title">{{ category }}</h2>
+    <div class="dashboard-grid">
+      {% for d in items %}
+        <article
+          class="dashboard-card"
+          tabindex="0"
+          role="button"
+          data-id="{{ d.id }}"
+          data-url="{{ d.url }}"
+          data-name="{{ d.name }}"
+          title="Double-click to open {{ d.name }} in a new tab">
+          <div class="card-icon">{{ d.icon or "🔗" }}</div>
+          <div class="card-body">
+            <h3 class="card-title">{{ d.name }}</h3>
+            {% if d.description %}<p class="card-desc">{{ d.description }}</p>{% endif %}
+          </div>
+          <div class="card-hint">Double-click to open ↗</div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/hub.js"></script>
+{% endblock %}

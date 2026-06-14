@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Testing — Ultimate Dashboard{% endblock %}
+
+{% block content %}
+<section class="hub-intro">
+  <h1>Testing area</h1>
+  <p class="muted">
+    Submitted dashboards awaiting admin approval. Double-click to try one in a new tab.
+    Once an admin approves it, it moves to the main Hub.
+  </p>
+  <a class="btn btn-primary" href="/dashboards/submit">+ Submit a dashboard</a>
+</section>
+
+{% if dashboards %}
+  <div class="dashboard-grid" style="margin-top:1.5rem;">
+    {% for d in dashboards %}
+      <article
+        class="dashboard-card"
+        tabindex="0"
+        role="button"
+        data-id="{{ d.id }}"
+        data-url="{{ d.url }}"
+        data-name="{{ d.name }}"
+        title="Double-click to open {{ d.name }} in a new tab">
+        <div class="card-icon">{{ d.icon or "🔗" }}</div>
+        <div class="card-body">
+          <h3 class="card-title">{{ d.name }} <span class="badge">pending</span></h3>
+          {% if d.description %}<p class="card-desc">{{ d.description }}</p>{% endif %}
+          <p class="card-desc">Submitted by {{ d.submitted_by or "—" }}</p>
+        </div>
+        <div class="card-hint">Double-click to open ↗</div>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty"><p>Nothing in testing right now.</p></div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/hub.js"></script>
+{% endblock %}

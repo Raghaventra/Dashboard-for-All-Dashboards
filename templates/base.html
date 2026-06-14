@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ theme_pref }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Ultimate Dashboard{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/img/logo.svg" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <!-- Apply theme before paint to avoid a flash of the wrong theme.
+       Source of truth: the logged-in user's saved preference (from the server);
+       anonymous visitors fall back to localStorage, default light. -->
+  <script>
+    window.__LOGGED_IN__ = {{ 'true' if logged_in else 'false' }};
+    (function () {
+      try {
+        var serverTheme = {{ ('"' ~ theme_pref ~ '"') if logged_in else 'null' }};
+        var t = serverTheme || localStorage.getItem("ud-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("ud-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-logo-wrap">{% include "partials/logo_inline.html" %}</span>
+      <span class="brand-text">Ultimate Dashboard</span>
+    </a>
+
+    <nav class="topbar-actions">
+      {% if current_user %}
+        <a class="nav-link" href="/">Hub</a>
+        <a class="nav-link" href="/testing">Testing</a>
+        <a class="nav-link" href="/dashboards/submit">+ Add</a>
+        <a class="nav-link" href="/account">Account</a>
+        {% if current_user.is_admin %}
+          <a class="nav-link" href="/admin">Admin</a>
+        {% endif %}
+        <span class="user-chip" title="{{ current_user.email }}">
+          {{ current_user.username or current_user.email }}
+          {% if current_user.is_admin %}<span class="badge">admin</span>{% endif %}
+        </span>
+      {% endif %}
+
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">
+        <span class="theme-icon-light">🌞</span>
+        <span class="theme-icon-dark">🌙</span>
+      </button>
+
+      {% if current_user %}
+        <form method="post" action="/logout" class="inline-form">
+          <button class="btn btn-ghost" type="submit">Log out</button>
+        </form>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span>Ultimate Dashboard — single entry point to your internal tools.</span>
+  </footer>
+
+  <script src="/static/js/theme.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

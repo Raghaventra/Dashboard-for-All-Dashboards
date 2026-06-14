@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Verify email — Ultimate Dashboard{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>Enter your code</h1>
+    <p class="muted">We emailed a 6-digit code to <strong>{{ email }}</strong>.</p>
+
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+    <form method="post" action="/verify" class="form">
+      <input type="hidden" name="email" value="{{ email }}" />
+      <label class="field">
+        <span>Verification code</span>
+        <input type="text" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+               placeholder="123456" required autofocus />
+      </label>
+      <button class="btn btn-primary btn-block" type="submit">Verify</button>
+    </form>
+
+    <form method="post" action="/resend-otp" class="inline-form resend">
+      <input type="hidden" name="email" value="{{ email }}" />
+      <button class="btn btn-ghost" type="submit">Resend code</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Document Automation",
+    "url": "http://localhost:8101",
+    "description": "Generate and manage automated documents.",
+    "icon": "📄",
+    "category": "Productivity",
+    "sort_order": 10
+  },
+  {
+    "name": "Robot Wi-Fi Identification",
+    "url": "http://localhost:8102",
+    "description": "Identify and look up robot Wi-Fi networks.",
+    "icon": "📶",
+    "category": "Robotics",
+    "sort_order": 20
+  },
+  {
+    "name": "Bug Tracking",
+    "url": "http://localhost:8103",
+    "description": "Track and triage software and validation bugs.",
+    "icon": "🐞",
+    "category": "Engineering",
+    "sort_order": 30
+  },
+  {
+    "name": "Robot Password Management",
+    "url": "http://localhost:8104",
+    "description": "Manage and rotate robot credentials.",
+    "icon": "🔐",
+    "category": "Robotics",
+    "sort_order": 40
+  }
+]

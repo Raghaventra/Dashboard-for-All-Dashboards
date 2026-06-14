@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Account — Ultimate Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-head">
+  <h1>Account</h1>
+  <p class="muted">Email <strong>{{ current_user.email }}</strong> · Username <strong>{{ current_user.username }}</strong></p>
+</section>
+
+{% if info %}<div class="alert alert-info">{{ info }}</div>{% endif %}
+{% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+
+<div class="panel">
+  <h2>Verification code</h2>
+  <p class="muted">Changing your username or password requires a code emailed to {{ current_user.email }}.</p>
+  <form method="post" action="/account/request-code" class="inline-form">
+    <button class="btn btn-primary" type="submit">Send verification code</button>
+  </form>
+  {% if code_sent %}<p class="muted" style="margin-top:0.6rem;">Code sent — enter it below within {{ '' }}a few minutes.</p>{% endif %}
+</div>
+
+<div class="panel">
+  <h2>Change username</h2>
+  <form method="post" action="/account/username" class="form" style="max-width:420px;">
+    <label class="field"><span>New username</span><input name="new_username" minlength="3" required /></label>
+    <label class="field"><span>Verification code</span><input name="code" inputmode="numeric" maxlength="6" required /></label>
+    <button class="btn btn-primary" type="submit">Update username</button>
+  </form>
+</div>
+
+<div class="panel">
+  <h2>Change password</h2>
+  <form method="post" action="/account/password" class="form" style="max-width:420px;">
+    <label class="field"><span>Current password</span><input type="password" name="current_password" required /></label>
+    <label class="field"><span>New password</span><input type="password" name="new_password" minlength="8" required /></label>
+    <label class="field"><span>Confirm new password</span><input type="password" name="confirm_password" minlength="8" required /></label>
+    <label class="field"><span>Verification code</span><input name="code" inputmode="numeric" maxlength="6" required /></label>
+    <button class="btn btn-primary" type="submit">Update password</button>
+  </form>
+</div>
+{% endblock %}
