@@ -12,13 +12,13 @@ from app.config import settings
 
 def send_otp_email(recipient: str, code: str) -> bool:
     """Send the OTP code to ``recipient``. Returns True if SMTP accepted it."""
-    subject = "Your Ultimate Dashboard verification code"
+    subject = "Your HAYSTACK Ultimate Toolkit verification code"
     body = (
         f"Hello,\n\n"
-        f"Your Ultimate Dashboard verification code is: {code}\n\n"
+        f"Your HAYSTACK Ultimate Toolkit verification code is: {code}\n\n"
         f"It expires in {settings.OTP_TTL_MINUTES} minutes. "
         f"If you did not request this, you can ignore this email.\n\n"
-        f"— Ultimate Dashboard"
+        f"— HAYSTACK Ultimate Toolkit"
     )
 
     msg = EmailMessage()

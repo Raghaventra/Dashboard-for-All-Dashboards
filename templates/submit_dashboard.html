@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Submit a dashboard — Ultimate Dashboard{% endblock %}
+{% block title %}Submit a dashboard — HAYSTACK Ultimate Toolkit{% endblock %}
 
 {% block content %}
 <div class="auth-wrap">
@@ -15,12 +15,29 @@
         <input name="name" value="{{ name or '' }}" required autofocus />
       </label>
       <label class="field">
+        <span>Creator name</span>
+        <input name="creator" value="{{ creator or '' }}" placeholder="Who made this tool?" />
+        <small class="hint">Shown as "Created by" on the tile. Defaults to your username.</small>
+      </label>
+      <label class="field">
         <span>Link / URL *</span>
         <input name="url" type="url" value="{{ url or '' }}" placeholder="http://192.168.x.x:port" required />
       </label>
       <label class="field">
-        <span>Icon (emoji)</span>
-        <input name="icon" value="{{ icon or '' }}" placeholder="🔗" />
+        <span>Icon</span>
+        <input id="dash-icon" name="icon" value="{{ icon or '' }}" placeholder="🔗 emoji, or upload an image →" />
+        <span class="icon-upload-row">
+          <span class="icon-preview" id="dash-icon-preview-wrap">
+            <span class="icon-preview-ph">Preview</span>
+            <img id="dash-icon-preview" src="" alt="" style="display:none;" />
+          </span>
+          <label class="btn btn-ghost btn-small file-pick">
+            Upload image
+            <input type="file" accept="image/*" data-crop="dashboard"
+                   data-target="#dash-icon" data-preview="#dash-icon-preview" hidden />
+          </label>
+        </span>
+        <small class="hint">Use an emoji, or upload a square image (max {{ max_upload_mb }} MB).</small>
       </label>
       <label class="field">
         <span>Category</span>

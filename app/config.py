@@ -49,11 +49,26 @@ class Settings:
     # --- Misc ---
     DEBUG: bool = _get_bool("DEBUG", False)
 
+    # Mark the session cookie "Secure" (only sent over HTTPS). Enable in
+    # production when served behind TLS (e.g. the nginx reverse proxy).
+    SESSION_HTTPS_ONLY: bool = _get_bool("SESSION_HTTPS_ONLY", False)
+
+    # --- Image uploads (profile pictures, dashboard logos) ---
+    # If S3_BUCKET is set, uploads go to S3 (boto3 picks up the EC2 instance role
+    # automatically — no keys needed). Otherwise they fall back to a local folder
+    # so the feature works in local development.
+    S3_BUCKET: str = os.getenv("S3_BUCKET", "")
+    S3_REGION: str = os.getenv("S3_REGION", "us-east-2")
+    S3_PREFIX: str = os.getenv("S3_PREFIX", "uploads")  # key prefix inside the bucket
+    MAX_UPLOAD_MB: int = int(os.getenv("MAX_UPLOAD_MB", "5"))
+    IMAGE_SIZE_PX: int = int(os.getenv("IMAGE_SIZE_PX", "512"))  # square output size
+
     # Filesystem locations (derived, not configured).
     BASE_DIR: Path = BASE_DIR
     DASHBOARDS_SEED_FILE: Path = BASE_DIR / "dashboards.json"
     TEMPLATES_DIR: Path = BASE_DIR / "templates"
     STATIC_DIR: Path = BASE_DIR / "static"
+    UPLOADS_DIR: Path = BASE_DIR / "uploads"  # local fallback when S3 isn't configured
 
     def email_domain_allowed(self, email: str) -> bool:
         email = email.strip().lower()

@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Testing — Ultimate Dashboard{% endblock %}
+{% block title %}Testing — HAYSTACK Ultimate Toolkit{% endblock %}
 
 {% block content %}
-<section class="hub-intro">
+<section class="page-head">
   <h1>Testing area</h1>
-  <p class="muted">
-    Submitted dashboards awaiting admin approval. Double-click to try one in a new tab.
-    Once an admin approves it, it moves to the main Hub.
-  </p>
-  <a class="btn btn-primary" href="/dashboards/submit">+ Submit a dashboard</a>
+  <p>Submitted dashboards awaiting admin approval. Click one to try it — once approved it moves to the Hub.</p>
 </section>
 
+<div class="toolbar">
+  <a class="btn btn-primary" href="/dashboards/submit">+ Submit a dashboard</a>
+</div>
+
 {% if dashboards %}
-  <div class="dashboard-grid" style="margin-top:1.5rem;">
+  <div class="dashboard-grid">
     {% for d in dashboards %}
       <article
         class="dashboard-card"
@@ -21,14 +21,12 @@
         data-id="{{ d.id }}"
         data-url="{{ d.url }}"
         data-name="{{ d.name }}"
-        title="Double-click to open {{ d.name }} in a new tab">
-        <div class="card-icon">{{ d.icon or "🔗" }}</div>
-        <div class="card-body">
-          <h3 class="card-title">{{ d.name }} <span class="badge">pending</span></h3>
-          {% if d.description %}<p class="card-desc">{{ d.description }}</p>{% endif %}
-          <p class="card-desc">Submitted by {{ d.submitted_by or "—" }}</p>
-        </div>
-        <div class="card-hint">Double-click to open ↗</div>
+        title="Open {{ d.name }}">
+        <span class="card-open-cue">Open <span aria-hidden="true">↗</span></span>
+        <div class="card-icon{% if d.icon == 'brand' %} card-icon--brand{% endif %}">{% include "partials/card_icon.html" %}</div>
+        <h3 class="card-title">{{ d.name }} <span class="badge">pending</span></h3>
+        {% if d.description %}<p class="card-desc">{{ d.description }}</p>{% endif %}
+        <div class="card-hint">Created by: {{ d.submitted_by or "system" }}</div>
       </article>
     {% endfor %}
   </div>

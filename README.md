@@ -1,4 +1,4 @@
-# Ultimate Dashboard
+# HAYSTACK Ultimate Toolkit
 
 A centralized **Dashboard Hub** — a single entry point that links out to the
 software & validation teams' internal web dashboards (document automation,
@@ -43,8 +43,12 @@ Every launch and login is recorded in an activity log for basic auditability.
 
 FastAPI + Jinja2 templates + vanilla JS/CSS, SQLAlchemy + SQLite, bcrypt.
 
-> **Taking over the project?** Read [docs/HANDOVER.md](docs/HANDOVER.md) — a full
-> architecture, data-model, flow, deployment, and extension guide.
+> **Taking over the project?** Read [docs/HANDOVER.md](docs/HANDOVER.md) (full
+> architecture & data model) and [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md)
+> (decisions, current AWS state, workflow).
+>
+> **Operating the live cloud deployment?** See [DEPLOY.md](DEPLOY.md) — the EC2 +
+> S3 cheatsheet (Caddy/TLS, backups, redeploy). Running change log: [history.md](history.md).
 
 ## Setup
 

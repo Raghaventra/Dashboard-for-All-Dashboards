@@ -13,7 +13,6 @@ from app.models import (
     STATUS_APPROVED,
     STATUS_PENDING,
     STATUS_REJECTED,
-    ActivityLog,
     Dashboard,
     User,
 )
@@ -45,7 +44,9 @@ def admin_home(
         .all()
     )
     users = db.query(User).order_by(User.created_at.desc()).all()
-    recent = db.query(ActivityLog).order_by(ActivityLog.timestamp.desc()).limit(50).all()
+    # NOTE: the activity log is intentionally NOT shown in the web UI. Logging
+    # still happens to the database; it is viewable only by someone with local
+    # access to the server (see docs/PROJECT_CONTEXT.md for how to read it).
     return templates.TemplateResponse(
         "admin.html",
         page_context(
@@ -54,7 +55,6 @@ def admin_home(
             pending=pending,
             dashboards=dashboards,
             users=users,
-            recent=recent,
         ),
     )
 
@@ -130,7 +130,9 @@ def update_dashboard(
     icon: str = Form(""),
     category: str = Form(""),
     sort_order: int = Form(0),
-    is_active: str = Form("on"),
+    # Unchecked checkboxes are NOT sent by the browser, so the default must be
+    # "off" — otherwise un-ticking Active could never turn it off.
+    is_active: str = Form("off"),
     admin: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):

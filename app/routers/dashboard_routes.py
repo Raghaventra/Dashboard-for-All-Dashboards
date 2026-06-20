@@ -75,6 +75,7 @@ def submit_dashboard(
     icon: str = Form(""),
     category: str = Form(""),
     description: str = Form(""),
+    creator: str = Form(""),
     user: User = Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -85,7 +86,8 @@ def submit_dashboard(
         return templates.TemplateResponse(
             "submit_dashboard.html",
             page_context(request, user=user, error="Name and link are required.",
-                         name=name, url=url, icon=icon, category=category, description=description),
+                         name=name, url=url, icon=icon, category=category,
+                         description=description, creator=creator),
             status_code=400,
         )
 
@@ -96,7 +98,7 @@ def submit_dashboard(
         category=category.strip() or None,
         description=description.strip() or None,
         status=STATUS_PENDING,
-        submitted_by=user.username,
+        submitted_by=creator.strip() or user.username,
         is_active=True,
     )
     db.add(dashboard)

@@ -40,7 +40,7 @@ def seed_dashboards() -> None:
                     sort_order=int(item.get("sort_order", 0) or 0),
                     is_active=True,
                     status=STATUS_APPROVED,  # seeded dashboards go straight to the main page
-                    submitted_by="system",
+                    submitted_by=item.get("submitted_by") or "system",
                 )
             )
             existing_names.add(name)

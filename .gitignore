@@ -5,6 +5,9 @@
 *.db
 *.sqlite3
 
+# Local image uploads (S3 fallback in dev)
+uploads/
+
 # Python
 __pycache__/
 *.py[cod]

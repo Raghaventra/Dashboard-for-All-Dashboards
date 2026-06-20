@@ -3,68 +3,143 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Ultimate Dashboard{% endblock %}</title>
+  <meta name="color-scheme" content="light dark" />
+  <title>{% block title %}HAYSTACK Ultimate Toolkit{% endblock %}</title>
   <link rel="icon" type="image/svg+xml" href="/static/img/logo.svg" />
-  <link rel="stylesheet" href="/static/css/styles.css" />
-  <!-- Apply theme before paint to avoid a flash of the wrong theme.
-       Source of truth: the logged-in user's saved preference (from the server);
-       anonymous visitors fall back to localStorage, default light. -->
+
+  <!-- Theme bootstrap. Runs BEFORE the stylesheet so the correct theme is set
+       before any paint — no flash, no flicker on navigation.
+       Priority: this device's last choice (localStorage) wins instantly; a
+       logged-in user's server preference seeds a fresh device; default light. -->
   <script>
-    window.__LOGGED_IN__ = {{ 'true' if logged_in else 'false' }};
+    window.__LOGGED_IN__ = {% if logged_in %}true{% else %}false{% endif %};
+    window.__SERVER_THEME__ = {% if logged_in %}"{{ theme_pref }}"{% else %}null{% endif %};
     (function () {
       try {
-        var serverTheme = {{ ('"' ~ theme_pref ~ '"') if logged_in else 'null' }};
-        var t = serverTheme || localStorage.getItem("ud-theme") || "light";
-        document.documentElement.setAttribute("data-theme", t);
-        localStorage.setItem("ud-theme", t);
+        var ls = localStorage.getItem("ud-theme");
+        var hasLS = (ls === "light" || ls === "dark");
+        var t = hasLS ? ls : (window.__SERVER_THEME__ || "light");
+        var root = document.documentElement;
+        root.setAttribute("data-theme", t);
+        root.style.colorScheme = t;        // dark canvas during page swaps -> no white flash
+        // Only persist a real preference. An anonymous visitor with no stored
+        // value must NOT write "light", or it would later override a dark
+        // user's saved theme when they log in on this browser.
+        if (hasLS || window.__LOGGED_IN__) localStorage.setItem("ud-theme", t);
       } catch (e) {}
     })();
   </script>
+
+  <link rel="stylesheet" href="/static/vendor/cropper.min.css" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="/">
-      <span class="brand-logo-wrap">{% include "partials/logo_inline.html" %}</span>
-      <span class="brand-text">Ultimate Dashboard</span>
-    </a>
-
-    <nav class="topbar-actions">
-      {% if current_user %}
-        <a class="nav-link" href="/">Hub</a>
-        <a class="nav-link" href="/testing">Testing</a>
-        <a class="nav-link" href="/dashboards/submit">+ Add</a>
-        <a class="nav-link" href="/account">Account</a>
-        {% if current_user.is_admin %}
-          <a class="nav-link" href="/admin">Admin</a>
-        {% endif %}
-        <span class="user-chip" title="{{ current_user.email }}">
-          {{ current_user.username or current_user.email }}
-          {% if current_user.is_admin %}<span class="badge">admin</span>{% endif %}
+  {% set path = request.url.path %}
+  <header class="topbar {% if current_user %}topbar--app{% endif %}">
+    <div class="topbar-brand">
+      <a class="brand" href="/">
+        <span class="brand-logo-wrap">{% include "partials/logo_inline.html" %}</span>
+        <span class="brand-text">
+          <span class="brand-eyebrow">HAYSTACK</span>
+          <span class="brand-sub">Ultimate Toolkit</span>
         </span>
-      {% endif %}
+      </a>
+    </div>
 
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">
-        <span class="theme-icon-light">🌞</span>
-        <span class="theme-icon-dark">🌙</span>
+    <div class="topbar-main">
+    <div class="topbar-right">
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light or dark theme" title="Toggle theme">
+        <span class="theme-icon theme-icon-light">{% include "partials/icon_sun.html" %}</span>
+        <span class="theme-icon theme-icon-dark">{% include "partials/icon_moon.html" %}</span>
       </button>
 
       {% if current_user %}
-        <form method="post" action="/logout" class="inline-form">
-          <button class="btn btn-ghost" type="submit">Log out</button>
-        </form>
+      <div class="user-menu" id="user-menu">
+        <button class="user-trigger" id="user-trigger" aria-haspopup="true" aria-expanded="false">
+          <span class="avatar">{% if current_user.avatar_url %}<img src="{{ current_user.avatar_url }}" alt="" />{% else %}{{ (current_user.username or current_user.email)[0]|upper }}{% endif %}</span>
+          <span class="user-name">{{ current_user.username or current_user.email }}</span>
+          {% if current_user.is_admin %}<span class="badge">admin</span>{% endif %}
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="user-dropdown" id="user-dropdown" role="menu">
+          <div class="dropdown-head">
+            <div class="dropdown-name">{{ current_user.username }}</div>
+            <div class="dropdown-email">{{ current_user.email }}</div>
+          </div>
+          <a class="dropdown-item {% if path == '/account' %}active{% endif %}" href="/account" role="menuitem">
+            {% include "partials/icon_user.html" %} Account
+          </a>
+          {% if current_user.is_admin %}
+          <a class="dropdown-item {% if path.startswith('/admin') %}active{% endif %}" href="/admin" role="menuitem">
+            {% include "partials/icon_shield.html" %} Admin
+          </a>
+          {% endif %}
+          <div class="dropdown-sep"></div>
+          <form method="post" action="/logout">
+            <button class="dropdown-item danger" type="submit" role="menuitem">
+              {% include "partials/icon_logout.html" %} Log out
+            </button>
+          </form>
+        </div>
+      </div>
       {% endif %}
-    </nav>
+    </div>
+    </div>
   </header>
 
-  <main class="content">
-    {% block content %}{% endblock %}
-  </main>
+  <div class="shell">
+    {% if current_user %}
+    <aside class="sidebar">
+      <nav class="side-nav">
+        <a class="nav-item {% if path == '/' %}active{% endif %}" href="/">
+          {% include "partials/icon_grid.html" %}<span>Hub</span>
+        </a>
+        <a class="nav-item {% if path == '/testing' %}active{% endif %}" href="/testing">
+          {% include "partials/icon_beaker.html" %}<span>Testing</span>
+        </a>
+        <a class="nav-item {% if path == '/dashboards/submit' %}active{% endif %}" href="/dashboards/submit">
+          {% include "partials/icon_plus.html" %}<span>Add dashboard</span>
+        </a>
+        {% if current_user.is_admin %}
+        <a class="nav-item {% if path.startswith('/admin') %}active{% endif %}" href="/admin">
+          {% include "partials/icon_shield.html" %}<span>Admin</span>
+        </a>
+        {% endif %}
+      </nav>
+      <div class="sidebar-foot">
+        <span class="muted">Single entry point to your internal tools.</span>
+      </div>
+    </aside>
+    {% endif %}
 
-  <footer class="footer">
-    <span>Ultimate Dashboard — single entry point to your internal tools.</span>
-  </footer>
+    <main class="content {% if not current_user %}content-centered{% endif %}">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  {% if current_user %}
+  <!-- Shared image-crop modal (square only). Driven by inputs with data-crop. -->
+  <div class="crop-modal" id="crop-modal" aria-hidden="true">
+    <div class="crop-dialog" role="dialog" aria-modal="true" aria-label="Crop image">
+      <div class="crop-head">
+        <h3>Crop your image</h3>
+        <p class="muted">Drag to reposition · scroll or pinch to zoom · square crop only</p>
+      </div>
+      <div class="crop-stage"><img id="crop-image" alt="" /></div>
+      <div class="crop-error alert alert-error" id="crop-error" style="display:none;"></div>
+      <div class="crop-actions">
+        <button type="button" class="btn btn-ghost" id="crop-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="crop-save">Save</button>
+      </div>
+    </div>
+  </div>
+  <script src="/static/vendor/cropper.min.js"></script>
+  <script>window.UD_MAX_UPLOAD_MB = {{ max_upload_mb }};</script>
+  <script src="/static/js/cropper-init.js"></script>
+  {% endif %}
 
   <script src="/static/js/theme.js"></script>
+  <script src="/static/js/menu.js"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

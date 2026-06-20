@@ -1,4 +1,4 @@
-"""Database models for the Ultimate Dashboard hub."""
+"""Database models for the HAYSTACK Ultimate Toolkit hub."""
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
@@ -7,7 +7,7 @@ from app.database import Base
 
 
 class User(Base):
-    """A registered Ultimate Dashboard user.
+    """A registered HAYSTACK Ultimate Toolkit user.
 
     Authentication here is for the hub itself only. The underlying dashboards
     keep their own separate security.
@@ -26,6 +26,9 @@ class User(Base):
 
     # Remembered UI theme ("light" or "dark"); defaults to light for new users.
     theme_preference = Column(String(10), default="light", nullable=False)
+
+    # Profile picture, served via /media/<key> (S3 or local). None = initial avatar.
+    avatar_url = Column(String(500), nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     last_login_at = Column(DateTime, nullable=True)

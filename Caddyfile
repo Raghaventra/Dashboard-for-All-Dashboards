@@ -1,0 +1,74 @@
+# Caddyfile — public entry point for the HAYSTACK Ultimate Toolkit on EC2.
+#
+# Architecture:  one Elastic IP -> one EC2 instance -> Caddy on :443 -> many
+# local services on many ports. Caddy terminates TLS (automatic Let's Encrypt
+# for the domain below) and routes by URL path to each tool, so users get clean
+# URLs like  https://toolkit.haystack-robotics.com/productivity/document-automation
+# with no port and no per-tool certificate.
+#
+# Deploy: install Caddy on the EC2 box, drop this file at /etc/caddy/Caddyfile,
+# `sudo systemctl reload caddy`. DNS A record for the domain must point at the
+# Elastic IP, and the security group / ufw must allow 80 (ACME challenge) + 443.
+#
+# IMPORTANT — keep the upstream ports here in sync with the relative paths in
+# dashboards.json. Each tool listed below maps to one entry there.
+
+toolkit.haystack-robotics.com {
+
+	# --- Tools, routed by path -------------------------------------------------
+	# handle_path STRIPS the matched prefix before proxying, so each tool sees
+	# requests at its own root ("/"). This works for tools that are path-agnostic.
+	#
+	# CAVEAT: a tool whose pages emit ROOT-ABSOLUTE asset links (e.g. "/static/x",
+	# "/api/y" — common with Streamlit/SPAs) will still break under a sub-path,
+	# because the browser then requests those at the domain root and Caddy routes
+	# them to the Toolkit (the catch-all below), not the tool. For such a tool,
+	# either (a) configure its base-path/root_path so it emits prefixed links, or
+	# (b) give it its own subdomain instead of a path (see the commented block at
+	# the bottom). Track each tool's status in docs/PROJECT_CONTEXT.md as it migrates.
+	#
+	# Upstreams are written as localhost:PORT assuming the tools are co-located on
+	# this EC2 instance. If a tool runs on another host, point at its reachable
+	# address (e.g. 10.x.x.x:PORT) instead.
+
+	# Streamlit app — start it with: --server.baseUrlPath /productivity/document-automation
+	# Use `handle` (NOT handle_path) so the prefix is PRESERVED and forwarded; Streamlit
+	# needs it to emit correct /static and /_stcore/stream (websocket) URLs.
+	handle /productivity/document-automation* {
+		reverse_proxy localhost:5555
+	}
+
+	handle_path /robotics/wifi-identification* {
+		reverse_proxy localhost:9999
+	}
+
+	handle_path /robotics/password-management* {
+		reverse_proxy localhost:8104
+	}
+
+	handle_path /robotics/agent-haystack* {
+		# Currently runs on 54.144.1.169:8765 over self-signed TLS. Once co-located
+		# on this instance, change to localhost:8765. To proxy to the remote HTTPS
+		# upstream meanwhile, use:
+		#   reverse_proxy https://54.144.1.169:8765 {
+		#       transport http { tls_insecure_skip_verify }
+		#   }
+		reverse_proxy localhost:8765
+	}
+
+	# --- The Toolkit itself (catch-all) ---------------------------------------
+	# Everything not matched above goes to the FastAPI/uvicorn app. Behind Caddy
+	# the app serves plain HTTP on localhost:8000 (Caddy handles TLS), so the
+	# systemd unit's uvicorn ExecStart should drop its --ssl-* flags.
+	handle {
+		reverse_proxy localhost:8000
+	}
+}
+
+# --- Subdomain alternative (for tools that can't live under a sub-path) -------
+# Uncomment and adjust if a tool needs its own root domain instead of a path.
+# Caddy will auto-provision TLS for it too (DNS A record required).
+#
+# docauto.haystack-robotics.com {
+# 	reverse_proxy localhost:5555
+# }

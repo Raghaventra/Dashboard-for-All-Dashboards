@@ -1,34 +1,56 @@
 [
   {
     "name": "Document Automation",
-    "url": "http://localhost:8101",
+    "url": "/productivity/document-automation",
     "description": "Generate and manage automated documents.",
     "icon": "📄",
     "category": "Productivity",
-    "sort_order": 10
+    "sort_order": 10,
+    "submitted_by": "Sugin Elankavi"
   },
   {
     "name": "Robot Wi-Fi Identification",
-    "url": "http://localhost:8102",
+    "url": "/robotics/wifi-identification",
     "description": "Identify and look up robot Wi-Fi networks.",
     "icon": "📶",
     "category": "Robotics",
-    "sort_order": 20
+    "sort_order": 20,
+    "submitted_by": "Sugin Elankavi"
   },
   {
     "name": "Bug Tracking",
-    "url": "http://localhost:8103",
+    "url": "https://bugtracker.haystackrobots.com/",
     "description": "Track and triage software and validation bugs.",
     "icon": "🐞",
     "category": "Engineering",
-    "sort_order": 30
+    "sort_order": 30,
+    "submitted_by": "Ponmeganathan S"
   },
   {
     "name": "Robot Password Management",
-    "url": "http://localhost:8104",
+    "url": "/robotics/password-management",
     "description": "Manage and rotate robot credentials.",
     "icon": "🔐",
     "category": "Robotics",
-    "sort_order": 40
+    "sort_order": 40,
+    "submitted_by": "Rgv"
+  },
+  {
+    "name": "Ultimate RviZ Automation",
+    "url": "#",
+    "description": "To run automation with RviZ Screen Recording.",
+    "icon": "/static/img/splash.png",
+    "category": "Engineering",
+    "sort_order": 35,
+    "submitted_by": "Jagadeesh V"
+  },
+  {
+    "name": "Agent Haystack",
+    "url": "/robotics/agent-haystack",
+    "description": "Live telemetry to — and runs over-the-air Docker updates from — a central dashboard, all over a single outbound MQTT connection.",
+    "icon": "brand",
+    "category": "Robotics",
+    "sort_order": 25,
+    "submitted_by": "Rgv"
   }
 ]

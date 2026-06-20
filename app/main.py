@@ -1,4 +1,4 @@
-"""Ultimate Dashboard - application entry point.
+"""HAYSTACK Ultimate Toolkit - application entry point.
 
 A centralized hub that links out to the team's internal dashboards, with its
 own lightweight login (email + OTP verification), an activity log for basic
@@ -19,21 +19,21 @@ from app.auth import AuthRedirect, get_current_user
 from app.config import settings
 from app.database import SessionLocal, init_db
 from app.maintenance import purge_old_data
-from app.routers import account_routes, admin_routes, auth_routes, dashboard_routes
+from app.routers import account_routes, admin_routes, auth_routes, dashboard_routes, media_routes
 from app.seed import seed_dashboards
 from app.templating import page_context, templates
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("ultimate_dashboard")
 
-app = FastAPI(title="Ultimate Dashboard", docs_url=None, redoc_url=None)
+app = FastAPI(title="HAYSTACK Ultimate Toolkit", docs_url=None, redoc_url=None)
 
 # Signed-cookie sessions. https_only should be True behind HTTPS in production.
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.SECRET_KEY,
     same_site="lax",
-    https_only=False,
+    https_only=settings.SESSION_HTTPS_ONLY,
     max_age=60 * 60 * 12,  # 12 hours
 )
 
@@ -45,6 +45,7 @@ app.include_router(auth_routes.router)
 app.include_router(dashboard_routes.router)
 app.include_router(account_routes.router)
 app.include_router(admin_routes.router)
+app.include_router(media_routes.router)
 
 
 @app.exception_handler(AuthRedirect)

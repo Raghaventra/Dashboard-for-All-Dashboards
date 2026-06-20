@@ -8,7 +8,7 @@ SQLAlchemy 1.3 compatible.
 """
 import logging
 
-from sqlalchemy import create_engine, inspect, text
+from sqlalchemy import create_engine, event, inspect, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -35,6 +35,22 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+if _is_sqlite:
+    @event.listens_for(engine, "connect")
+    def _sqlite_pragmas(dbapi_conn, _record):
+        """Tune SQLite for a concurrent web server on every new connection.
+
+        WAL lets readers and a writer work at once (no more 'database is locked'
+        under load); busy_timeout makes a writer wait briefly instead of erroring;
+        synchronous=NORMAL is the safe/fast pairing with WAL.
+        """
+        cur = dbapi_conn.cursor()
+        cur.execute("PRAGMA journal_mode=WAL")
+        cur.execute("PRAGMA synchronous=NORMAL")
+        cur.execute("PRAGMA busy_timeout=5000")
+        cur.close()
+
+
 def get_db():
     """FastAPI dependency: yields a session, rolls back on error, always closes."""
     db = SessionLocal()
@@ -57,6 +73,7 @@ _EXPECTED_COLUMNS = {
     },
     "users": {
         "theme_preference": "VARCHAR(10) NOT NULL DEFAULT 'light'",
+        "avatar_url": "VARCHAR(500)",
     },
 }
 

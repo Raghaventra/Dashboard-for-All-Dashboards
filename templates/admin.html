@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Admin — Ultimate Dashboard{% endblock %}
+{% block title %}Admin — HAYSTACK Ultimate Toolkit{% endblock %}
 
 {% block content %}
-<section class="admin-head">
+<section class="page-head">
   <h1>Admin</h1>
-  <p class="muted">Manage dashboards, users, and review recent activity.</p>
+  <p>Manage dashboards, users, and review recent activity.</p>
 </section>
 
 <!-- ====================== Pending approvals ========================== -->
@@ -51,7 +51,16 @@
     <form method="post" action="/admin/dashboards/create" class="form grid-form">
       <label class="field"><span>Name</span><input name="name" required /></label>
       <label class="field"><span>URL</span><input name="url" type="url" placeholder="http://..." required /></label>
-      <label class="field"><span>Icon (emoji)</span><input name="icon" placeholder="🔗" /></label>
+      <label class="field"><span>Icon</span>
+        <input id="admin-icon" name="icon" placeholder="🔗 or upload →" />
+        <span class="icon-upload-row">
+          <span class="icon-preview"><span class="icon-preview-ph">Preview</span><img id="admin-icon-preview" src="" alt="" style="display:none;" /></span>
+          <label class="btn btn-ghost btn-small file-pick">Upload
+            <input type="file" accept="image/*" data-crop="dashboard"
+                   data-target="#admin-icon" data-preview="#admin-icon-preview" hidden />
+          </label>
+        </span>
+      </label>
       <label class="field"><span>Category</span><input name="category" placeholder="General" /></label>
       <label class="field"><span>Sort order</span><input name="sort_order" type="number" value="0" /></label>
       <label class="field field-wide"><span>Description</span><input name="description" /></label>
@@ -129,31 +138,6 @@
           </td>
           <td>{{ u.last_login_at.strftime("%Y-%m-%d %H:%M") if u.last_login_at else "—" }}</td>
         </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- ========================= Recent activity ========================= -->
-<section class="panel">
-  <h2>Recent activity</h2>
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr><th>Time (UTC)</th><th>User</th><th>Action</th><th>Detail</th><th>IP</th></tr>
-      </thead>
-      <tbody>
-        {% for log in recent %}
-        <tr>
-          <td>{{ log.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
-          <td>{{ log.username or log.email or "—" }}</td>
-          <td><code>{{ log.action }}</code></td>
-          <td>{{ log.detail or "" }}</td>
-          <td class="muted">{{ log.ip_address or "" }}</td>
-        </tr>
-        {% else %}
-        <tr><td colspan="5" class="muted center">No activity yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>

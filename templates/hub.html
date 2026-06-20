@@ -1,23 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Hub — Ultimate Dashboard{% endblock %}
+{% block title %}Hub — HAYSTACK Ultimate Toolkit{% endblock %}
 
 {% block content %}
-<section class="hub-intro">
+<section class="page-head">
   <h1>Welcome{% if current_user.username %}, {{ current_user.username }}{% endif %} 👋</h1>
-  <p class="muted">
-    Double-click any tool to open it in a new tab. {{ total }} dashboard{{ '' if total == 1 else 's' }} available.
-  </p>
+  <p>Click any tool to open it. {{ total }} dashboard{{ '' if total == 1 else 's' }} available.</p>
 </section>
+
+<div class="toolbar">
+  <div class="search">
+    {% include "partials/icon_search.html" %}
+    <input id="dashboard-search" type="search" placeholder="Search dashboards…" autocomplete="off" aria-label="Search dashboards" />
+  </div>
+  {% if current_user.is_admin and pending_count %}
+    <a class="btn btn-ghost" href="/admin">{{ pending_count }} pending approval{{ '' if pending_count == 1 else 's' }}</a>
+  {% endif %}
+</div>
 
 {% if total == 0 %}
   <div class="empty">
     <p>No dashboards have been added yet.</p>
-    {% if current_user.is_admin %}<a class="btn btn-primary" href="/admin">Add dashboards</a>{% endif %}
+    <a class="btn btn-primary" href="/dashboards/submit" style="margin-top:0.8rem;">+ Add a dashboard</a>
   </div>
 {% endif %}
 
+<div id="dashboard-root">
 {% for category, items in categories.items() %}
-  <section class="hub-category">
+  <section class="hub-category" data-category>
     <h2 class="category-title">{{ category }}</h2>
     <div class="dashboard-grid">
       {% for d in items %}
@@ -28,18 +37,20 @@
           data-id="{{ d.id }}"
           data-url="{{ d.url }}"
           data-name="{{ d.name }}"
-          title="Double-click to open {{ d.name }} in a new tab">
-          <div class="card-icon">{{ d.icon or "🔗" }}</div>
-          <div class="card-body">
-            <h3 class="card-title">{{ d.name }}</h3>
-            {% if d.description %}<p class="card-desc">{{ d.description }}</p>{% endif %}
-          </div>
-          <div class="card-hint">Double-click to open ↗</div>
+          data-search="{{ (d.name ~ ' ' ~ (d.description or '') ~ ' ' ~ (d.category or ''))|lower }}"
+          title="Open {{ d.name }}">
+          <span class="card-open-cue">Open <span aria-hidden="true">↗</span></span>
+          <div class="card-icon{% if d.icon == 'brand' %} card-icon--brand{% endif %}">{% include "partials/card_icon.html" %}</div>
+          <h3 class="card-title">{{ d.name }}</h3>
+          {% if d.description %}<p class="card-desc">{{ d.description }}</p>{% endif %}
+          <div class="card-hint">Created by: {{ d.submitted_by or "system" }}</div>
         </article>
       {% endfor %}
     </div>
   </section>
 {% endfor %}
+</div>
+<div class="no-results" id="no-results">No dashboards match your search.</div>
 {% endblock %}
 
 {% block scripts %}

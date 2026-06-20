@@ -1,0 +1,1 @@
+{% if d.icon == 'brand' %}{% include "partials/logo_inline.html" %}{% elif d.icon and (d.icon.startswith('/') or d.icon.startswith('http') or d.icon.split('?')[0].endswith(('.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp'))) %}<img class="card-icon-img" src="{{ d.icon }}" alt="{{ d.name }} logo" />{% else %}{{ d.icon or "🔗" }}{% endif %}

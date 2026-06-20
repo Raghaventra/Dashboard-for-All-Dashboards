@@ -1,4 +1,4 @@
-# Ultimate Dashboard — Handover & Architecture Guide
+# HAYSTACK Ultimate Toolkit — Handover & Architecture Guide
 
 This document is written for a developer **taking over the project**. It
 explains what the app is, how it's built, how every piece fits together, how to
@@ -11,7 +11,7 @@ Last updated: 2026-06-14.
 
 ## 1. What this is (and isn't)
 
-**Ultimate Dashboard** is a centralized **Dashboard Hub**: a single web app that
+**HAYSTACK Ultimate Toolkit** is a centralized **Dashboard Hub**: a single web app that
 links out to the software & validation teams' internal dashboards (document
 automation, robot Wi-Fi identification, bug tracking, robot password management,
 and any others added later).
@@ -75,7 +75,7 @@ Tested on Python 3.8. No frontend toolchain — assets are static files.
 ## 3. Directory layout
 
 ```
-Ultimate Dashboard/
+Ultimate Toolkit/
 ├── app/
 │   ├── main.py            # FastAPI app: middleware, routers, exception handlers, startup
 │   ├── config.py          # Settings loaded from .env (no hardcoded secrets/paths)

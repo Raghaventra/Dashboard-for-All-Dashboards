@@ -6,3 +6,5 @@ itsdangerous
 sqlalchemy
 bcrypt
 python-dotenv
+Pillow
+boto3
